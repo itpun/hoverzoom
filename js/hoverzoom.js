@@ -454,29 +454,9 @@ var hoverZoom = {
                     video.addEventListener('error', imgFullSizeOnError);
                     video.addEventListener('loadedmetadata', function(){
                         posImg();
-                        track = this.addTextTrack("captions", "English", "en");
-                        track.mode = "showing";
-                        var videoDur = Math.floor(video.duration);
-                        for (time=0; time <= videoDur; time++){
-                            var minutes = ~~(time / 60);
-                            var seconds = time % 60;
-                            var finalTime = "";
-                            finalTime += "" + minutes + ":" + (seconds < 10 ? "0" : "");
-                            finalTime += "" + seconds;
-                            if (time== videoDur){
-                                track.addCue(new VTTCue(time,video.duration,finalTime));
-                                track.cues[time].align ="end";
-                                track.cues[time].position = 100;
-                                track.cues[time].line = 0;
+                        
+                        addTimerTrack(video);
 
-                            }
-                            else{
-                                track.addCue(new VTTCue(time, time+1, finalTime)); 
-                                track.cues[time].align ="end";
-                                track.cues[time].position = 100;
-                                track.cues[time].line = 0;
-                            }
-                        }
                     });
                     video.addEventListener('loadeddata', function() {
                         imgFullSizeOnLoad();
@@ -500,6 +480,37 @@ var hoverZoom = {
                 posImg();
             }
             posImg();
+        }
+
+        function addTimerTrack(video){
+            track = video.addTextTrack("captions", "English", "en");
+            track.mode = "showing";
+            var videoDur = Math.ceil(video.duration);
+            // create an array that hosts the times from decending order
+            var timer = [];
+            for (time=videoDur; time >= 0; time--){
+                var minutes = ~~(time / 60);
+                var seconds = time % 60;
+                var finalTime = "";
+                finalTime += "-" + minutes + ":" + (seconds < 10 ? "0" : "");
+                finalTime += "" + seconds;
+                timer.push(finalTime);
+            }
+            for (var i=0; i<=videoDur;i++){
+                if(i==videoDur){              
+                    track.addCue(new VTTCue(i,video.duration,timer[i]));
+                    track.cues[i].align ="end";
+                    track.cues[i].position = 100;
+                    track.cues[i].line = 0;  
+                }
+                else{
+                    track.addCue(new VTTCue(i,i+1,timer[i]));
+                    track.cues[i].align ="end";
+                    track.cues[i].position = 100;
+                    track.cues[i].line = 0;     
+                }
+
+            }
         }
 
         function imgFullSizeOnLoad() {
