@@ -479,8 +479,7 @@ var hoverZoom = {
                         }
                     });
                     video.addEventListener('loadeddata', function() {
-                        ();
-                        // this works. see if you can get an area where you can put a layer on this to.
+                        imgFullSizeOnLoad();
                         video.play();
                         video.removeAttribute('poster');
 
